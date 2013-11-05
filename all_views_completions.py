@@ -16,7 +16,7 @@ MAX_FIX_TIME_SECS_PER_VIEW = 0.01
 
 class AllAutocomplete(sublime_plugin.EventListener):
 
-    def on_query_completions(self, view, prefix, locations):
+    def on_query_completions(self, view, prefix, locations):        
         words = []
 
         # Limit number of views but always include the active view. This
@@ -26,10 +26,19 @@ class AllAutocomplete(sublime_plugin.EventListener):
         views = views[0:MAX_VIEWS]
 
         for v in views:
+            print locations
+
+            # Hacking around dash auto-completion bug
+            # https://github.com/alienhard/SublimeAllAutocomplete/issues/18
+            #if len(locations) > 0 and v.id == view.id:
+            #    view_words = v.extract_completions(prefix, locations[0])
+            #else:
+            #    view_words = v.extract_completions(prefix)            
             if len(locations) > 0 and v.id == view.id:
-                view_words = v.extract_completions(prefix, locations[0])
+                view_words = extract_completions_wdash(v,prefix,locations[0])
             else:
-                view_words = v.extract_completions(prefix)
+                view_words = extract_completions_wdash(v,prefix);
+
             view_words = filter_words(view_words)
             view_words = fix_truncation(v, view_words)
             words += view_words
@@ -37,6 +46,18 @@ class AllAutocomplete(sublime_plugin.EventListener):
         words = without_duplicates(words)
         matches = [(w, w.replace('$', '\\$')) for w in words]
         return matches
+
+# extract auto-completions with dash
+# see https://github.com/alienhard/SublimeAllAutocomplete/issues/18
+def extract_completions_wdash(v,prefix,location=0):    
+    word_regions = v.find_all(prefix,0)
+    words = []
+
+    for wr in word_regions:
+        word = v.substr(v.word(wr))        
+        words.append(word)
+
+    return words
 
 def filter_words(words):
     words = words[0:MAX_WORDS_PER_VIEW]
