@@ -26,8 +26,6 @@ class AllAutocomplete(sublime_plugin.EventListener):
         views = views[0:MAX_VIEWS]
 
         for v in views:
-            print locations
-
             # Hacking around dash auto-completion bug
             # https://github.com/alienhard/SublimeAllAutocomplete/issues/18
             #if len(locations) > 0 and v.id == view.id:
