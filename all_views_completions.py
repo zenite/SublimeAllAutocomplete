@@ -16,13 +16,22 @@ MAX_FIX_TIME_SECS_PER_VIEW = 0.01
 
 class AllAutocomplete(sublime_plugin.EventListener):
 
-    def __init__(self):
-        self.dash_hack_sytaxes = sublime.load_settings('AllAutocomplete.sublime-settings').get('apply_with_dash_hack_syntaxes')
-        if not self.dash_hack_sytaxes:
-            #using default settings
-            self.dash_hack_sytaxes = ["source.sass","source.css"]
+    #default settings
+    dash_hack_sytaxes = ["source.sass","source.css"]
+    return_nothing_on_empty = True
 
-    def on_query_completions(self, view, prefix, locations):
+    def __init__(self):
+        dash_hack_sytaxes = sublime.load_settings('AllAutocomplete.sublime-settings').get('apply_with_dash_hack_syntaxes')
+        return_nothing_on_empty = sublime.load_settings('AllAutocomplete.sublime-settings').get('return_nothing_on_empty_prefix')
+        
+        #using default settings
+        if dash_hack_sytaxes != None:                        
+            self.dash_hack_sytaxes = dash_hack_sytaxes
+
+        if return_nothing_on_empty != None:
+            self.return_nothing_on_empty = return_nothing_on_empty
+
+    def on_query_completions(self, view, prefix, locations):        
         words = []
 
         # Limit number of views but always include the active view. This
@@ -30,6 +39,10 @@ class AllAutocomplete(sublime_plugin.EventListener):
         other_views = [v for v in sublime.active_window().views() if v.id != view.id]
         views = [view] + other_views
         views = views[0:MAX_VIEWS]
+
+        if self.return_nothing_on_empty:
+            if not prefix:
+                return words;
 
         for v in views:
             # Hacking around dash auto-completion bug

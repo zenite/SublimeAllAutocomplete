@@ -1,3 +1,4 @@
 {
-	"apply_with_dash_hack_syntaxes": ["source.sass","source.css"]
+	"apply_with_dash_hack_syntaxes": ["source.sass","source.css"],
+	"return_nothing_on_empty_prefix": true
 }
