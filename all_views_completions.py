@@ -19,10 +19,12 @@ class AllAutocomplete(sublime_plugin.EventListener):
     #default settings
     dash_hack_sytaxes = ["source.sass","source.css"]
     return_nothing_on_empty = True
+    not_search_in_current = True
 
     def __init__(self):
         dash_hack_sytaxes = sublime.load_settings('AllAutocomplete.sublime-settings').get('apply_with_dash_hack_syntaxes')
         return_nothing_on_empty = sublime.load_settings('AllAutocomplete.sublime-settings').get('return_nothing_on_empty_prefix')
+        not_search_in_current = sublime.load_settings('do_not_search_in_current_view').get('return_nothing_on_empty_prefix')
         
         #using default settings
         if dash_hack_sytaxes != None:                        
@@ -31,7 +33,10 @@ class AllAutocomplete(sublime_plugin.EventListener):
         if return_nothing_on_empty != None:
             self.return_nothing_on_empty = return_nothing_on_empty
 
-    def on_query_completions(self, view, prefix, locations):        
+        if not_search_in_current != None:
+            self.not_search_in_current = not_search_in_current
+
+    def on_query_completions(self, view, prefix, locations):
         words = []
 
         # Limit number of views but always include the active view. This
@@ -45,19 +50,23 @@ class AllAutocomplete(sublime_plugin.EventListener):
                 return words;
 
         for v in views:
+            view_words = []
+            location = 0
             # Hacking around dash auto-completion bug
             # https://github.com/alienhard/SublimeAllAutocomplete/issues/18
+
+            # Sublime probably already works fine with suggestions from current view
+            if self.not_search_in_current and v.id == view.id:
+                continue
+
+            if len(locations) > 0 and v.id == view.id:
+                location = locations[0]
+
             if is_need_to_be_hacked(v, self.dash_hack_sytaxes):
                 # apply hack for css and sass only
-                if len(locations) > 0 and v.id == view.id:
-                    view_words = extract_completions_wdash(v,prefix,locations[0])
-                else:
-                    view_words = extract_completions_wdash(v,prefix);
-            else:
-                if len(locations) > 0 and v.id == view.id:
-                    view_words = v.extract_completions(prefix, locations[0])
-                else:
-                    view_words = v.extract_completions(prefix)
+                view_words = extract_completions_wdash(v,prefix);
+            else:  
+                view_words = v.extract_completions(prefix, location)
 
             view_words = filter_words(view_words)
             view_words = fix_truncation(v, view_words)
@@ -75,7 +84,7 @@ def is_need_to_be_hacked(v, dash_hack_sytaxes):
 
 # extract auto-completions with dash
 # see https://github.com/alienhard/SublimeAllAutocomplete/issues/18
-def extract_completions_wdash(v,prefix,location=0):    
+def extract_completions_wdash(v,prefix):    
     word_regions = v.find_all(prefix,0)
     words = []
 
