@@ -16,7 +16,13 @@ MAX_FIX_TIME_SECS_PER_VIEW = 0.01
 
 class AllAutocomplete(sublime_plugin.EventListener):
 
-    def on_query_completions(self, view, prefix, locations):        
+    def __init__(self):
+        self.dash_hack_sytaxes = sublime.load_settings('AllAutocomplete.sublime-settings').get('apply_with_dash_hack_syntaxes')
+        if not self.dash_hack_sytaxes:
+            #using default settings
+            self.dash_hack_sytaxes = ["source.sass","source.css"]
+
+    def on_query_completions(self, view, prefix, locations):
         words = []
 
         # Limit number of views but always include the active view. This
@@ -28,14 +34,17 @@ class AllAutocomplete(sublime_plugin.EventListener):
         for v in views:
             # Hacking around dash auto-completion bug
             # https://github.com/alienhard/SublimeAllAutocomplete/issues/18
-            #if len(locations) > 0 and v.id == view.id:
-            #    view_words = v.extract_completions(prefix, locations[0])
-            #else:
-            #    view_words = v.extract_completions(prefix)            
-            if len(locations) > 0 and v.id == view.id:
-                view_words = extract_completions_wdash(v,prefix,locations[0])
+            if is_need_to_be_hacked(v, self.dash_hack_sytaxes):
+                # apply hack for css and sass only
+                if len(locations) > 0 and v.id == view.id:
+                    view_words = extract_completions_wdash(v,prefix,locations[0])
+                else:
+                    view_words = extract_completions_wdash(v,prefix);
             else:
-                view_words = extract_completions_wdash(v,prefix);
+                if len(locations) > 0 and v.id == view.id:
+                    view_words = v.extract_completions(prefix, locations[0])
+                else:
+                    view_words = v.extract_completions(prefix)
 
             view_words = filter_words(view_words)
             view_words = fix_truncation(v, view_words)
@@ -44,6 +53,12 @@ class AllAutocomplete(sublime_plugin.EventListener):
         words = without_duplicates(words)
         matches = [(w, w.replace('$', '\\$')) for w in words]
         return matches
+
+def is_need_to_be_hacked(v, dash_hack_sytaxes):
+    for syntax in dash_hack_sytaxes:
+        if v.scope_name(0).find(syntax) >= 0:
+            return True
+    return False
 
 # extract auto-completions with dash
 # see https://github.com/alienhard/SublimeAllAutocomplete/issues/18

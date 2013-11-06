@@ -1,9 +1,21 @@
 All Autocomplete Sublime Text
 ===========================================================
 
+This fork includes hack to fix sass and css dash-bug
+https://github.com/alienhard/SublimeAllAutocomplete/issues/18
+
 Extends the default autocomplete to find matches in all open files.
 
 By default Sublime only considers words found in the current file.
+
+
+Configure
+---------
+
+You can define settings "apply_with_dash_hack_syntaxes" in AllAutocomplete.sublime-settings to select to which sytaxes apply "-dash hack"
+
+You can also remove dash from "word_separators" option in syntax specific settings for CSS or SASS if you want to see all suggestions,
+not only after pressing next dash.
 
 
 Install
