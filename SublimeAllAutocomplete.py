@@ -15,7 +15,7 @@ MAX_WORDS_PER_VIEW = 100
 MAX_FIX_TIME_SECS_PER_VIEW = 0.01
 
 #Change this variable to True to se debug output
-DEBUG = True
+DEBUG = False
 
 class SubLimeallautocomplete(sublime_plugin.EventListener):
     #default settings
