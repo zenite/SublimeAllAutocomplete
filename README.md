@@ -30,20 +30,17 @@ You can also install this package manually by entering the Packages directory of
 Configure
 ---------
 
-You can define settings "apply_with_dash_hack_syntaxes" in AllAutocomplete.sublime-settings to select to which sytaxes apply "-dash hack"
+Available options (with default values):
+{
+	"apply_with_dash_hack_syntaxes": ["source.sass","source.css"],
+	"return_nothing_on_empty_prefix": true,
+	"do_not_search_in_current_view": false
+}
+
+You can override this settings in user AllAutocomplete.sublime-settings (preferences->package settings->SublimeAllAutoComplete->Settings-User)
 
 You can also remove dash from "word_separators" option in syntax specific settings for CSS or SASS if you want to see all suggestions,
-not only after pressing next dash.
-
-DEBUGGING
----------
-1. Uninstall plugin installed via package manager;
-2. Clone (or unpack archive) plugin into your Packages directory;
-3. rename all_views_completions.py to all_views_completions.py.ver, and all_views_completions.py.debug to all_views_completions.py;
-4. restart sublime and run console (view->show console or ctrl+`);
-5. Try using autocompletion, see what's in console.
-
-Good luck!
+not only after pressing next dash. (Settings-More->Syntax Specific-User, when file of particular syntax is open)
 
 
 LICENSE
