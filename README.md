@@ -1,3 +1,8 @@
+# Maintainer needed
+I do not use sublime anymore and therefore can't properly maintain the package. If you feel, that you need it and can improve - please contact me about transferring this package.
+
+This package is a temorary hack, however it seems like it still needed by some people.
+
 All Autocomplete Sublime Text
 ===========================================================
 
